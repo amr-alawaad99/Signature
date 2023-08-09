@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "444992723059",
+    "project_id": "signature-e470c",
+    "storage_bucket": "signature-e470c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444992723059:android:37d18172d6547a4882f206",
+        "android_client_info": {
+          "package_name": "com.signature_kyoutech.signature"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444992723059-eigg7j5th67qfr7ko3k45mgv3938tfo4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.signature_kyoutech.signature",
+            "certificate_hash": "8cda06bf1ebc7881fc507c5fec4056267952ae5e"
+          }
+        },
+        {
+          "client_id": "444992723059-arb561kfcugnbuah4e4hv6biufss5t5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAj1NWv0fG1Ko3MQAe8Ptah8U7TSrtaGgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444992723059-arb561kfcugnbuah4e4hv6biufss5t5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
