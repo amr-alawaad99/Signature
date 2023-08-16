@@ -1,16 +1,19 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:signature/constants.dart';
+import 'package:signature/cubit/main_cubit.dart';
 
 import '../../components.dart';
 
 class AddMomentScreen extends StatelessWidget {
-
-  var textController = TextEditingController();
-  var dateTimeNow = DateTime.now().toString().substring(0,19);
-
   AddMomentScreen({super.key});
+
+  static final TextEditingController textController = TextEditingController();
+  final String dateTimeNow = DateTime.now().toString().substring(0,19);
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,67 +40,62 @@ class AddMomentScreen extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 1,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              // if(state is SocialCreatePostLoadingState)
-              //   const LinearProgressIndicator(),
-              // if(state is SocialCreatePostLoadingState)
-              //   const SizedBox(
-              //     height: 10.0,
-              //   ),
-              TextFormField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "What is happening!",
-                  hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Colors.grey,
-                    fontSize: 20,
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            TextFormField(
+              maxLines: 15,
+              minLines: 1,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: "What is happening!",
+                hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Colors.grey,
+                  fontSize: 20,
                 ),
-                controller: textController,
               ),
-              // if(HomeCubit.get(context).postImage != null)
-              //   Stack(
-              //     alignment: AlignmentDirectional.bottomStart,
-              //     children: [
-              //       Align(
-              //         alignment: AlignmentDirectional.topCenter,
-              //         child: Stack(
-              //           alignment: AlignmentDirectional.topEnd,
-              //           children: [
-              //             Container(
-              //               height: 140.0,
-              //               width: double.infinity,
-              //               decoration: BoxDecoration(
-              //                 image: DecorationImage(
-              //                   image: FileImage(HomeCubit.get(context).postImage!),
-              //                   fit: BoxFit.cover,
-              //                 ),
-              //                 borderRadius: BorderRadius.circular(4.0,
-              //                 ),
-              //               ),
-              //             ),
-              //             IconButton(
-              //               onPressed: () {
-              //                 HomeCubit.get(context).removePostImage();
-              //               },
-              //               icon: const CircleAvatar(
-              //                 child: Icon(
-              //                   Icons.close,
-              //                   size: 20.0,
-              //                 ),
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-            ],
-          ),
+              controller: textController,
+            ),
+            if(MainCubit.get(context).imageFileList!.isNotEmpty)
+              Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height*0.43,
+                child: GridView.builder(
+                  itemCount: MainCubit.get(context).imageFileList!.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                  itemBuilder: (context, index) =>
+                      Padding(
+                        padding:
+                        const EdgeInsets.all(2.0),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.file(File(MainCubit.get(context).imageFileList![index].path),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: IconButton(
+                                onPressed: () {
+                                  MainCubit.get(context).clearImage(index);
+                                },
+                                icon: const Icon(Icons.highlight_remove_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
       bottomSheet: InkWell(
@@ -125,6 +123,7 @@ class AddMomentScreen extends StatelessWidget {
         ),
         onTap: () {
           // HomeCubit.get(context).getPostImage();
+          MainCubit.get(context).selectImages();
         },
       ),
     );

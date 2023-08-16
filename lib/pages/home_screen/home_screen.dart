@@ -1,7 +1,11 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:signature/components.dart';
 import 'package:signature/constants.dart';
+import 'package:signature/cubit/main_cubit.dart';
+import 'package:signature/cubit/main_state.dart';
 import 'package:signature/pages/add_moment_screen/add_moment_screen.dart';
 import 'package:signature/pages/onboarding_screen/onboarding_screen.dart';
 
@@ -18,89 +22,117 @@ class HomeScreen extends StatelessWidget {
     double height ({double ofHeight = 1}){
       return MediaQuery.of(context).size.height * ofHeight;
     }
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => <Widget>[
-          SliverAppBar(
-            elevation: 0,
-            floating: true,
-            toolbarHeight: height(ofHeight: 0.09),
-            backgroundColor: Colors.transparent,
-            flexibleSpace: Align(
-              alignment: Alignment.bottomCenter,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  /// Search Bar
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(height(ofHeight: 0.01)),
-                      child: defaultTextFormField(
-                        context,
-                        noBorder: true,
-                        hintText: 'Search your moments',
-                        prefixIcon: const Icon(TablerIcons.search, color: Colors.black45,),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.all(height(ofHeight: 0.005)),
-                          /// Profile
-                          child: InkWell(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => Padding(
-                                  padding: EdgeInsets.symmetric(vertical: height(ofHeight: 0.2), horizontal: width(ofWidth: 0.1)),
-                                  child: Container(
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(25)),
-                                    ),
-                                    child: Scaffold(
-                                      body: SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            CircleAvatar(backgroundImage: NetworkImage(profilePicUrl), radius: height(ofHeight: 0.1)),
-                                            Text('Name Here!'),
-                                            Container(
-                                              child: defaultButton(
-                                                onPress: () {
-                                                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnBoardingScreen(),), (route) => false);
-                                                },
-                                                text: 'Log out'
+    return BlocBuilder<MainCubit, MainState>(
+      builder: (context, state) => Scaffold(
+        body: ConditionalBuilder(
+          condition: MainCubit.get(context).originalUser != null,
+          builder: (context) => CustomScrollView(
+            slivers: [
+              /// Appbar
+              SliverAppBar(
+                elevation: 0,
+                floating: true,
+                toolbarHeight: height(ofHeight: 0.09),
+                backgroundColor: Colors.transparent,
+                flexibleSpace: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    children: [
+                      /// Search Bar
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(height(ofHeight: 0.01)),
+                          child: defaultTextFormField(
+                            context,
+                            noBorder: true,
+                            hintText: 'Search your moments',
+                            prefixIcon: const Icon(TablerIcons.search, color: Colors.black45,),
+                            suffixIcon: Padding(
+                              padding: EdgeInsets.all(height(ofHeight: 0.005)),
+                              /// Profile
+                              child: InkWell(
+                                onTap: () {
+                                  Future.delayed(
+                                    const Duration(microseconds: 800),
+                                        () {
+                                      showGeneralDialog(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        barrierLabel: 'Profile',
+                                        transitionBuilder: (context, animation, secondaryAnimation, child) {
+                                          Tween<Offset> tween;
+                                          tween = Tween(begin: const Offset(0, -1), end: Offset.zero);
+                                          return SlideTransition(
+                                            position: tween.animate(CurvedAnimation(parent: animation, curve: Curves.easeOut),),
+                                            child: child,
+                                          );
+                                        },
+                                        pageBuilder: (context, animation, secondaryAnimation) => Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(vertical: height(ofHeight: 0.2), horizontal: width(ofWidth: 0.1)),
+                                            child: Container(
+                                              clipBehavior: Clip.antiAlias,
+                                              decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.all(Radius.circular(25)),
                                               ),
-                                            )
-                                          ],
+                                              child: Scaffold(
+                                                body: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: [
+                                                      CircleAvatar(backgroundImage: NetworkImage(MainCubit.get(context).originalUser!.profilePic!), radius: height(ofHeight: 0.1)),
+                                                      Text(MainCubit.get(context).originalUser!.name!),
+                                                      Container(
+                                                        child: defaultButton(
+                                                            onPress: () {
+                                                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnBoardingScreen(),), (route) => false);
+                                                            },
+                                                            text: 'Log out'
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: CircleAvatar(backgroundColor: Colors.white,),
+                                      );
+                                    },
+                                  );
+
+                                },
+                                child: CircleAvatar(backgroundColor: Colors.white,backgroundImage: NetworkImage(MainCubit.get(context).originalUser!.profilePic!)),
+                              ),
+                            ),
+                            backgroundColor: primaryColor,
                           ),
                         ),
-                        backgroundColor: primaryColor,
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              /// Body
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: 1, (context, index) => SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(5, (index) => postCard(context)),
+                  ),
+                ),
+                ),
+              ),
+            ],
           ),
-        ],
-        body: SingleChildScrollView(
-          child: Column(
-            children: List.generate(5, (index) => postCard(context)),
-          ),
+          fallback: (context) => const Center(child: CircularProgressIndicator()),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddMomentScreen(),));
-        },
-        child: const Icon(Icons.add),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddMomentScreen(),));
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

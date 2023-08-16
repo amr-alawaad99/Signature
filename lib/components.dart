@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:signature/constants.dart';
 
 Widget defaultTextFormField(
@@ -11,6 +12,7 @@ Widget defaultTextFormField(
       Widget? suffixIcon,
       bool noBorder = false,
       Color? backgroundColor,
+      TextEditingController? controller,
     }) =>
     Container(
       decoration: backgroundColor != null? BoxDecoration(
@@ -31,6 +33,11 @@ Widget defaultTextFormField(
           suffixIcon: suffixIcon?? suffixIcon,
         ),
         keyboardType: keyboardType,
+        controller: controller,
+        onTapOutside: (event) {
+          // to dismiss keyboard on tapping out of the TFF
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
       ),
     );
 
@@ -77,4 +84,22 @@ Widget defaultButton({
               ),
             ),
       ),
+    );
+
+
+/// Show Toast
+void showToast({
+  required String message,
+  required Color toastColor,
+  Color textColor = Colors.white,
+  double fontSize = 16.0,
+}) =>
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: toastColor,
+      textColor: textColor,
+      fontSize: fontSize,
     );
