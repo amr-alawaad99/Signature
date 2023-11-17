@@ -42,3 +42,10 @@ class SelectMultipleImagesErrorState extends MainState{}
 class ClearImageSuccessState extends MainState{}
 
 class MultipleImagesUploadedState extends MainState{}
+
+class MultipleAssetsSelectedState extends MainState{}
+
+class AssetRemovedFromAssetListState extends MainState{}
+
+class UploadPostLoadingState extends MainState{}
+class UploadPostSuccessState extends MainState{}

@@ -8,12 +8,12 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:video_player/video_player.dart';
 
-class MediaViewer extends StatelessWidget {
+class MediaViewerFromURL extends StatelessWidget {
   final AssetType assetType;
-  File file;
-  MediaViewer({super.key, required this.file, required this.assetType});
+  String url;
+  MediaViewerFromURL({super.key, required this.url, required this.assetType});
 
-  late VideoPlayerController videoPlayerController = VideoPlayerController.file(file);
+  late VideoPlayerController videoPlayerController = VideoPlayerController.networkUrl(Uri.dataFromString(url));
   late ChewieController chewieController = ChewieController(videoPlayerController: videoPlayerController, aspectRatio: 16/9);
 
   @override
@@ -25,14 +25,13 @@ class MediaViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if(assetType == AssetType.image) {
-      print('11111111111111');
       return Scaffold(
       body: Center(
         // using builder instead of just a PhotoView so it doesn't scroll to next page when moving in a zoomed image
         child: PhotoViewGallery.builder(
           builder: (context, index) {
             return PhotoViewGalleryPageOptions(
-              imageProvider: FileImage(file),
+              imageProvider: NetworkImage(url),
               minScale: PhotoViewComputedScale.contained,
               maxScale: PhotoViewComputedScale.covered * 2,
             );
@@ -42,13 +41,12 @@ class MediaViewer extends StatelessWidget {
       ),
     );
     } else {
-      print('222222222');
       return Scaffold(
         backgroundColor: Colors.black,
         body: Container(
           height: MediaQuery.of(context).size.height,
           alignment: Alignment.center,
-          child: VideoPlayerView(url: file.path, dataSourceType: DataSourceType.file,),
+          child: VideoPlayerView(url: url, dataSourceType: DataSourceType.network,),
         ),
       );
     }

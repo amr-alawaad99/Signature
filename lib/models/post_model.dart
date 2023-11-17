@@ -1,25 +1,33 @@
-class UserModel{
+class PostModel{
   String? uId;
-  String? name;
-  String? profilePic;
+  String? dateTime;
+  String? text;
+  String? urls;
+  bool? isEditable;
 
-  UserModel({
+  PostModel({
     this.uId,
-    this.name,
-    this.profilePic,
+    this.dateTime,
+    this.text,
+    this.urls,
+    this.isEditable,
   });
 
-  UserModel.fromJson(Map<String,dynamic> json){
+  PostModel.fromJson(Map<String,dynamic> json){
     uId = json['uId'];
-    name = json['name'];
-    profilePic = json['profilePic'];
+    dateTime = json['dateTime'];
+    text = json['text'];
+    urls = json['urls'];
+    isEditable = json['isEditable'];
   }
 
   Map<String, dynamic> toMap(){
     return{
       'uId' : uId,
-      'name' : name,
-      'profilePic' : profilePic,
+      'dateTime' : dateTime,
+      'text' : text,
+      'urls' : urls,
+      'isEditable' : isEditable,
     };
   }
 }

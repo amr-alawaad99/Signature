@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,8 +7,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:signature/constants.dart';
+import 'package:signature/models/post_model.dart';
 import 'package:signature/models/user_model.dart';
+import 'package:signature/pages/media_picker/media_picker.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../components.dart';
 import '../cache_helper.dart';
@@ -107,14 +112,12 @@ class MainCubit extends Cubit<MainState>{
 
   /// Upload picked picture to Firebase storage
   String? picUrl;
-  Future<void> uploadProfilePic({
-    String? profileName,
-  }) async {
+  Future<void> uploadProfilePic() async {
     emit(UploadProfilePicLoadingState());
     await FirebaseStorage.instance
         .ref()
         .child(
-        'users/$uID/profile_pictures/${Uri.file(profilePic!.path).pathSegments.last}')
+        'users/$uID/profile_pictures/${Random().nextInt(999999)}${Uri.file(profilePic!.path).pathSegments.last}')
         .putFile(profilePic!)
         .then((value) async {
       await value.ref.getDownloadURL().then((value2) {
@@ -131,7 +134,7 @@ class MainCubit extends Cubit<MainState>{
   }
 
   /// Create User in the DB (Firestore)
-  void createUser({
+  createUser({
     required String name,
     required String profilePic,
 }) async {
@@ -171,52 +174,85 @@ class MainCubit extends Cubit<MainState>{
     });
   }
 
-  /// Select Multiple Images from your Gallery
-  List<XFile>? imageFileList = [];
-  final ImagePicker imagePicker = ImagePicker();
-  Future<void> selectImages() async {
-
-    try {
-      final List<XFile> selectedImages = await imagePicker.pickMultipleMedia();
-      if (selectedImages.isNotEmpty) {
-        imageFileList!.addAll(selectedImages);
-      } else {
-        print('No image selected');
+  /// Select Multiple assets from your Gallery
+  List<AssetEntity> selectedAssets = [];
+  List<File> files = [];
+  Future pickAssets(context, {
+    required int maxCount,
+    required RequestType requestType,
+}) async {
+    final List<AssetEntity> result = await Navigator.push(context, MaterialPageRoute(builder: (context) => MediaPicker(maxCount, requestType),));
+    if(result.isNotEmpty){
+      selectedAssets = result;
+      files = [];
+      for(int i = 0; i < selectedAssets.length; i++){
+        File? file = await selectedAssets[i].file;
+        files.add(file!);
       }
-      emit(SelectMultipleImagesSuccessState());
-    } catch (e) {
-      emit(SelectMultipleImagesErrorState());
+      emit(MultipleAssetsSelectedState());
     }
-  }
-  /// Delete Image from selection
-  clearImage(int index) {
-    imageFileList!.removeAt(index);
-    emit(ClearImageSuccessState());
+}
+
+  /// Remove Asset from Asset List
+  void removeAssetFromList({
+    required int index,
+}){
+    selectedAssets.removeAt(index);
+    emit(AssetRemovedFromAssetListState());
   }
 
-  /// Upload Images to Firebase Storage
-  List<String> listOfUrls = [];
 
-  Future<String> uploadFile(XFile image) async {
-    Reference reference = FirebaseStorage.instance.ref().child("users/orders_pics/${Uri.file(image.path).pathSegments.last}");
-    reference.putFile(File(image.path)).whenComplete(() => () {
-      print("Pic Uploaded");
+  /// Upload post to DB and Pic to Firebase Storage
+  Future<void> uploadPost({
+    required List<File> file,
+    required String dateTime,
+    required String text,
+  }) async {
+    String urls = '';
+    emit(UploadPostLoadingState());
+    for (File element in file) {
+      await FirebaseStorage.instance.ref()
+          // Upload File to Firebase Storage
+          .child('users/$uID/profile_pictures/${Random().nextInt(999999)}${Uri.file(element.path).pathSegments.last}')
+          .putFile(element).then((value1) async {
+            // Get File Url
+            await value1.ref.getDownloadURL().then((value2) {
+              urls += '$value2,';
+            });
+      }).catchError((error){
+        print(error);
+      });
+    }
+    PostModel postModel = PostModel(
+      uId: '',
+      text: text?? '',
+      dateTime: dateTime,
+      urls: urls,
+      isEditable: true
+    );
+    await FirebaseFirestore.instance.collection('users').doc(uID).collection('posts').add(postModel.toMap()).then((value) {
+      value.update({'uId' : value.id});
+      emit(UploadPostSuccessState());
     });
-    return await reference.getDownloadURL();
   }
 
-  uploadImage(List<XFile> images) async {
-    listOfUrls = [];
-    for (int i = 0; i < images.length; i++) {
-      var imageUrl = await uploadFile(images[i]);
-      listOfUrls.add(imageUrl.toString());
-    }
-    emit(MultipleImagesUploadedState());
+  /// Get Posts as stream
+  Stream<List<PostModel>> getPosts() {
+    return FirebaseFirestore.instance.collection('users').doc(uID).collection('posts').orderBy('dateTime')
+        .snapshots().map((event) {
+       return event.docs.map((e) => PostModel.fromJson(e.data())).toList();
+    });
   }
 
 
+  Future<String?> getVideoThumbnail (String url) async {
 
-
+    String? thumbTempPath = await VideoThumbnail.thumbnailFile(
+      video: url,
+      imageFormat: ImageFormat.WEBP,
+    );
+    return thumbTempPath;
+  }
 
 
 }

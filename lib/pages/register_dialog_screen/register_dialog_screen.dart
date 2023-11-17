@@ -332,10 +332,11 @@ class RegisterDialogScreen extends StatelessWidget {
                               onPress: () async {
                                 await MainCubit.get(context).uploadProfilePic();
                                 print("LLLLLLLLLLLLLLLLLLLLLLLLLLL${MainCubit.get(context).picUrl}");
-                                MainCubit.get(context).createUser(
+                                await MainCubit.get(context).createUser(
                                     name: profileNameController.text,
                                     profilePic: MainCubit.get(context).picUrl?? profilePicUrl
                                 );
+                                await MainCubit.get(context).getUserData();
                                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(),), (route) => false);
                               },
                               child: state is UploadProfilePicLoadingState || state is CreateAccountLoadingState?
