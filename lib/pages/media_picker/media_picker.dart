@@ -86,7 +86,7 @@ class MediaPicker extends StatelessWidget {
                 elevation: 0,
                 title:  DropdownButton(items: const [DropdownMenuItem(child: Text('Recent'))], onChanged: (value) {},),
               ),
-              body: const Center(child: CircularProgressIndicator()),
+              body: Center(child: state is AlbumsLoadedButEmptyState? const Text("Album is empty"): const CircularProgressIndicator()),
             ),
           );
         }

@@ -52,6 +52,7 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+            useMaterial3: false, // flutter 3.16 update fks up the UI with the new Material3 so we disable it
             fontFamily: 'Poppins',
             textTheme: TextTheme(
               bodyLarge: TextStyle(

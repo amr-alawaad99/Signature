@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,8 +16,6 @@ import 'package:signature/models/user_model.dart';
 import 'package:signature/pages/add_moment_screen/add_moment_screen.dart';
 import 'package:signature/pages/media_viewer/media_viewer_from_url.dart';
 import 'package:signature/pages/onboarding_screen/onboarding_screen.dart';
-
-import '../media_viewer/media_viewer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -157,7 +154,7 @@ class HomeScreen extends StatelessWidget {
               child: const Icon(Icons.add),
             ),
           ),
-          fallback: (context) => const CircularProgressIndicator(),
+          fallback: (context) => const Scaffold(body: Center(child: CircularProgressIndicator())),
 
         );},
     );
@@ -198,7 +195,7 @@ Widget postCard(context,UserModel userModel , PostModel postModel,) => Padding(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// avatar, name, time, and dialog button
+          /// avatar, name, and dialog button
           Row(
             mainAxisSize: MainAxisSize.max,
             children: [
@@ -209,92 +206,98 @@ Widget postCard(context,UserModel userModel , PostModel postModel,) => Padding(
               const SizedBox(width: 10,),
               Expanded(child: Text(userModel.name!, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold),)),
               SizedBox(width: MediaQuery.of(context).size.width * 0.03,),
-              Text(DateFormat.jm().format(DateTime.parse(postModel.dateTime!).toLocal()).toString()),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.03,),
-              // postModel.isEditable == true?
-              IconButton(
-                onPressed: () async {
-                  await localNTPTime();
-                  /// to check if the post was posted 30min ago or longer
-                  if(ntpTime.toUtc().difference(DateTime.parse(postModel.dateTime!)).inMinutes >= 30) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => Center(
+              MenuAnchor(
+                builder: (context, controller, child) {
+                  return IconButton(
+                    onPressed: () async {
+                      await localNTPTime();
+                      MainCubit.get(context).updateTime();
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    autofocus: true,
+                    icon: const Icon(TablerIcons.dots_vertical),
+                  );
+                },
+                menuChildren: [
+                  ntpTime.toUtc().difference(DateTime.parse(postModel.dateTime!)).inMinutes >= 30?
+                  Container(
+                    height: MediaQuery.of(context).size.width * 0.1,
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Center(
+                      child: Text("This post can not be deleted anymore!",
+                        style: Theme.of(context).textTheme.labelLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ) :
+                  MaterialButton(
+                    onPressed: () {
+                      showDialog(context: context, builder: (context) => Center(
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.7,
                           color: Colors.white,
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          padding: EdgeInsets.all(MediaQuery.of(context).size.aspectRatio * 30),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              MaterialButton(
-                                onPressed: () {},
-                                child: Text("Open"),
-                                minWidth: MediaQuery.of(context).size.width * 0.7,
-                                height: MediaQuery.of(context).size.width * 0.1,
-                              ),
-                              Divider(color: Colors.grey,),
-                              Container(
-                                height: MediaQuery.of(context).size.width * 0.1,
-                                child: Center(
-                                  child: Text("This post can not be deleted!",
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                  textAlign: TextAlign.center,
+                              const Text("Are you sure you want to delete this post?", textAlign: TextAlign.center),
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: defaultButton(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
+                                      width: MediaQuery.of(context).size.width * 0.2,
+                                      text: "No",
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(width: MediaQuery.of(context).size.width * 0.1,),
+                                  Container(
+                                    child: defaultButton(
+                                        onPress: () {
+                                          MainCubit.get(context).deletePost(postUid: postModel.uId);
+                                          Navigator.pop(context);
+                                        },
+                                      width: MediaQuery.of(context).size.width * 0.2,
+                                      text: "Yes",
+                                    ),
+                                  ),
+                                ],
                               ),
+
                             ],
                           ),
                         ),
                       ),
-                    );
-                  }
-                  else {
-                    showDialog(
-                      context: context,
-                      builder: (context) => Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              MaterialButton(
-                                onPressed: () {},
-                                child: Text("Open"),
-                                minWidth: MediaQuery.of(context).size.width * 0.7,
-                                height: MediaQuery.of(context).size.width * 0.1,
-                              ),
-                              Divider(color: Colors.grey,),
-                              MaterialButton(
-                                onPressed: () {},
-                                child: Text("Delete Post"),
-                                minWidth: MediaQuery.of(context).size.width * 0.7,
-                                height: MediaQuery.of(context).size.width * 0.1,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-              },
-                icon: const Icon(TablerIcons.dots_vertical),
+                      );
+                    },
+                    minWidth: MediaQuery.of(context).size.width * 0.3,
+                    height: MediaQuery.of(context).size.width * 0.1,
+                    child: const Text("Delete"),
+                  ),
+                ],
               ),
 
             ],
           ),
           /// text and pics/vid
           if(postModel.text! != '')
-            const SizedBox(height: 10.0,),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
           if(postModel.text! != '')
             Text(postModel.text!),
-          const SizedBox(height: 10.0,),
           if(postModel.urls != '')
             GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
               itemCount: postModel.urls!.split(',').length -1 > 4? 4 : postModel.urls!.split(',').length -1,
               itemBuilder: (context, index) {
@@ -360,6 +363,12 @@ Widget postCard(context,UserModel userModel , PostModel postModel,) => Padding(
                 );
               },
             ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
+          Row(
+            children: [
+              Text(DateFormat.jm().add_yMMMd().format(DateTime.parse(postModel.dateTime!).toLocal()).toString(),),
+            ],
+          ),
         ],
       ),
     ),

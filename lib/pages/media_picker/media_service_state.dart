@@ -9,6 +9,7 @@ class AlbumsLoadedState extends MediaServiceState{}
 
 class AssetsIsLoadingState extends MediaServiceState{}
 class AssetsLoadedState extends MediaServiceState{}
+class AlbumsLoadedButEmptyState extends MediaServiceState{}
 
 class ChangeSelectedAlbumState extends MediaServiceState{}
 

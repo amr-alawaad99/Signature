@@ -244,7 +244,7 @@ class MainCubit extends Cubit<MainState>{
     });
   }
 
-
+  /// to get a thumbnail pic of any video on home screen posts
   Future<String?> getVideoThumbnail (String url) async {
 
     String? thumbTempPath = await VideoThumbnail.thumbnailFile(
@@ -254,5 +254,21 @@ class MainCubit extends Cubit<MainState>{
     return thumbTempPath;
   }
 
+  /// delete post from DB
+  void deletePost({
+    required postUid,
+}) async {
+    emit(DeletePostLoadingState());
+    FirebaseFirestore.instance.collection("users").doc(uID).collection("posts").doc(postUid).delete().then((value) {
+      emit(DeletePostSuccessState());
+    }).catchError((error){
+      emit(DeletePostErrorState());
+    });
+}
+
+  /// updateTime
+  void updateTime(){
+    emit(UpdateTimeState());
+  }
 
 }
