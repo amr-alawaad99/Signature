@@ -57,6 +57,7 @@ class ClearImageSuccessState extends MainState {}
 class MultipleImagesUploadedState extends MainState {}
 
 class MultipleAssetsSelectedState extends MainState {}
+class NoAssetsSelectedState extends MainState {}
 
 class AssetRemovedFromAssetListState extends MainState {}
 

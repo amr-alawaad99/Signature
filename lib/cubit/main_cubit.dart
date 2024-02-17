@@ -13,6 +13,7 @@ import 'package:signature/models/post_model.dart';
 import 'package:signature/models/user_model.dart';
 import 'package:signature/pages/media_picker/media_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../components.dart';
 import '../cache_helper.dart';
@@ -181,7 +182,21 @@ class MainCubit extends Cubit<MainState>{
     required int maxCount,
     required RequestType requestType,
 }) async {
-    final List<AssetEntity> result = await Navigator.push(context, MaterialPageRoute(builder: (context) => MediaPicker(maxCount, requestType),));
+    // final List<AssetEntity> result = await Navigator.push(context, MaterialPageRoute(builder: (context) => MediaPicker(maxCount, requestType),));
+    // if(result.isNotEmpty){
+    //   selectedAssets = result;
+    //   files = [];
+    //   for(int i = 0; i < selectedAssets.length; i++){
+    //     File? file = await selectedAssets[i].file;
+    //     files.add(file!);
+    //   }
+    //   emit(MultipleAssetsSelectedState());
+    // }
+
+    final List<AssetEntity> result = await AssetPicker.pickAssets(
+      context,
+      pickerConfig: const AssetPickerConfig(),
+    )?? [];
     if(result.isNotEmpty){
       selectedAssets = result;
       files = [];
@@ -190,6 +205,8 @@ class MainCubit extends Cubit<MainState>{
         files.add(file!);
       }
       emit(MultipleAssetsSelectedState());
+    } else {
+      emit(NoAssetsSelectedState());
     }
 }
 

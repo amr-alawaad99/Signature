@@ -5,6 +5,7 @@ import 'package:signature/constants.dart';
 import 'package:signature/cubit/main_state.dart';
 import 'package:signature/pages/home_screen/home_screen.dart';
 import 'package:signature/pages/onboarding_screen/onboarding_screen.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import 'bloc_observer.dart';
 import 'cache_helper.dart';
@@ -15,6 +16,9 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await CacheHelper.init();
   Bloc.observer = MyBlocObserver();
+  AssetPicker.registerObserve();
+  // Enables logging with the photo_manager.
+  PhotoManager.setLog(true);
 
 
   uID = CacheHelper.getData(key: 'uId') ?? '';
