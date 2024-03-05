@@ -71,4 +71,8 @@ class DeletePostErrorState extends MainState {}
 
 class UpdateTimeState extends MainState {}
 
+class RefreshState extends MainState {}
+
+class SignOutSuccessState extends MainState {}
+
 

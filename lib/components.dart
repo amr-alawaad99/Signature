@@ -13,6 +13,7 @@ Widget defaultTextFormField(
       bool noBorder = false,
       Color? backgroundColor,
       TextEditingController? controller,
+      Function(String)? onChanged,
     }) =>
     Container(
       decoration: backgroundColor != null? BoxDecoration(
@@ -34,6 +35,7 @@ Widget defaultTextFormField(
         ),
         keyboardType: keyboardType,
         controller: controller,
+        onChanged: onChanged,
         onTapOutside: (event) {
           // to dismiss keyboard on tapping out of the TFF
           FocusManager.instance.primaryFocus?.unfocus();

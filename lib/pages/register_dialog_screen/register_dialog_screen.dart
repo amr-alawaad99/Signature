@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../components.dart';
 import '../../constants.dart';
@@ -15,6 +16,7 @@ class RegisterDialogScreen extends StatelessWidget {
   const RegisterDialogScreen({super.key});
 
   static final TextEditingController phoneNumberController = TextEditingController();
+  static final TextEditingController phoneNumberControllerTemp = TextEditingController();
   static final List<TextEditingController> otpController = List.generate(6, (index) => TextEditingController());
   static final TextEditingController profileNameController = TextEditingController();
   static final GlobalKey<FormState>formKey = GlobalKey<FormState>();
@@ -68,14 +70,18 @@ class RegisterDialogScreen extends StatelessWidget {
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Phone TextFormField
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.08,
-                            child: defaultTextFormField(
-                                context,
-                                labelText: 'Phone Number',
-                                keyboardType: TextInputType.number,
-                                controller: phoneNumberController
+                          IntlPhoneField(
+                            controller: phoneNumberControllerTemp,
+                            initialCountryCode: 'EG',
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: secondaryColor)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                              labelText: 'Phone Number',
+                              border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
                             ),
+                            onChanged: (value) {
+                              phoneNumberController.text = value.completeNumber;
+                            },
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Next Button
@@ -87,7 +93,7 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                             child: defaultButton(
                               onPress: () {
-                                MainCubit.get(context).sendOTP("+2${phoneNumberController.text}");
+                                MainCubit.get(context).sendOTP(phoneNumberController.text);
                               },
                               child: state is SendOTPLoadingState?
                               Row(
@@ -109,20 +115,20 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
-                          const Text('-or-'),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
-                          /// Google Signup Button
-                          Ink(
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            width: MediaQuery.of(context).size.height * 0.07,
-                            decoration: ShapeDecoration(shape: const CircleBorder(), color: Colors.grey.shade300,),
-                            child: IconButton(
-                              onPressed: () {},
-                              splashRadius: 30,
-                              padding: const EdgeInsets.only(bottom: 5),
-                              icon: Icon(TablerIcons.brand_google, color: Colors.red, size: MediaQuery.of(context).size.height * 0.05,),
-                            ),
-                          ),
+                          // const Text('-or-'),
+                          // SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
+                          // /// Google Signup Button
+                          // Ink(
+                          //   height: MediaQuery.of(context).size.height * 0.07,
+                          //   width: MediaQuery.of(context).size.height * 0.07,
+                          //   decoration: ShapeDecoration(shape: const CircleBorder(), color: Colors.grey.shade300,),
+                          //   child: IconButton(
+                          //     onPressed: () {},
+                          //     splashRadius: 30,
+                          //     padding: const EdgeInsets.only(bottom: 5),
+                          //     icon: Icon(TablerIcons.brand_google, color: Colors.red, size: MediaQuery.of(context).size.height * 0.05,),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

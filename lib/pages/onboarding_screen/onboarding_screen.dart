@@ -50,7 +50,7 @@ class OnBoardingScreen extends StatelessWidget {
                   child: const SizedBox(),
                 ),
               ),
-              /// Layer on top
+              /// Layer on top (UI)
               SafeArea(
                 child: Center(
                   child: SingleChildScrollView(
@@ -111,24 +111,24 @@ class OnBoardingScreen extends StatelessWidget {
                           ),
                           SizedBox(height: height(ofHeight: 0.02),),
                           /// Google Sign in Button
-                          Container(
-                            child: defaultButton(
-                              gradientColors: [Colors.white, Colors.white],
-                              onPress: () {},
-                              height: height(ofHeight: 0.07),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(TablerIcons.brand_google,color: Colors.red, size: height(ofHeight: 0.05),),
-                                  SizedBox(width: width(ofWidth: 0.02),),
-                                  Text("Sign in with Google", style: TextStyle(
-                                      fontSize: MediaQuery.of(context).textScaleFactor * 15,
-                                      fontWeight: FontWeight.bold
-                                  ),),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // Container(
+                          //   child: defaultButton(
+                          //     gradientColors: [Colors.white, Colors.white],
+                          //     onPress: () {},
+                          //     height: height(ofHeight: 0.07),
+                          //     child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: [
+                          //         Icon(TablerIcons.brand_google,color: Colors.red, size: height(ofHeight: 0.05),),
+                          //         SizedBox(width: width(ofWidth: 0.02),),
+                          //         Text("Sign in with Google", style: TextStyle(
+                          //             fontSize: MediaQuery.of(context).textScaleFactor * 15,
+                          //             fontWeight: FontWeight.bold
+                          //         ),),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                           SizedBox(height: height(ofHeight: 0.02),),
                           Text('Don\'t have an account?', style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 15),),
                           /// Register text button

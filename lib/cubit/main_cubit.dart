@@ -17,6 +17,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../components.dart';
 import '../cache_helper.dart';
+import '../pages/home_screen/home_screen.dart';
 import 'main_state.dart';
 
 class MainCubit extends Cubit<MainState>{
@@ -284,8 +285,35 @@ class MainCubit extends Cubit<MainState>{
 }
 
   /// updateTime
-  void updateTime(){
+  Future<void> updateTime() async {
     emit(UpdateTimeState());
   }
 
+  /// refresh on search
+  void refresh(){
+    emit(RefreshState());
+  }
+
+  ///SingOut
+  Future<void> singOut() async {
+    CacheHelper.removeData(key: 'uId').then((value) {
+      emit(SignOutSuccessState());
+    });
+  }
+
+
+  /// search
+  Stream<List<PostModel>> findPostByKeyWord({
+    required String keyWord,
+}) {
+    return FirebaseFirestore.instance
+        .collection("users").doc(uID).collection('posts').orderBy('dateTime')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .where((element) => element.data()["text"].toString().contains(keyWord) || element.data()["dateTime"].toString().contains(keyWord))
+          .map((e) => PostModel.fromJson(e.data()))
+          .toList();
+    });
+  }
 }

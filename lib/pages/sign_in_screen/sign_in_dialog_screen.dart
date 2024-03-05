@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../components.dart';
+import '../../constants.dart';
 import '../../cubit/main_cubit.dart';
 import '../../cubit/main_state.dart';
 import '../home_screen/home_screen.dart';
@@ -12,6 +14,7 @@ class SignInDialogScreen extends StatelessWidget {
   const SignInDialogScreen({super.key});
 
   static final TextEditingController phoneNumberController = TextEditingController();
+  static final TextEditingController phoneNumberControllerTemp = TextEditingController();
   static final List<TextEditingController> otpController = List.generate(6, (index) => TextEditingController());
   static final TextEditingController profileNameController = TextEditingController();
   static final GlobalKey<FormState>formKey = GlobalKey<FormState>();
@@ -61,14 +64,18 @@ class SignInDialogScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: MediaQuery.of(context).size.height * 0.02),),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Phone TextFormField
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.08,
-                            child: defaultTextFormField(
-                              context,
+                          IntlPhoneField(
+                            controller: phoneNumberControllerTemp,
+                            initialCountryCode: 'EG',
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: secondaryColor)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                               labelText: 'Phone Number',
-                              keyboardType: TextInputType.number,
-                              controller: phoneNumberController
+                              border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
                             ),
+                            onChanged: (value) {
+                              phoneNumberController.text = value.completeNumber;
+                            },
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Next Button
@@ -80,7 +87,7 @@ class SignInDialogScreen extends StatelessWidget {
                             ),
                             child: defaultButton(
                               onPress: () {
-                                MainCubit.get(context).sendOTP("+2${phoneNumberController.text}");
+                                MainCubit.get(context).sendOTP(phoneNumberController.text);
                               },
                               child: state is SendOTPLoadingState?
                               Row(
