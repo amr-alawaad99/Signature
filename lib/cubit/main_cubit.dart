@@ -7,17 +7,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'package:signature/constants.dart';
 import 'package:signature/models/post_model.dart';
 import 'package:signature/models/user_model.dart';
-import 'package:signature/pages/media_picker/media_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../components.dart';
 import '../cache_helper.dart';
-import '../pages/home_screen/home_screen.dart';
 import 'main_state.dart';
 
 class MainCubit extends Cubit<MainState>{

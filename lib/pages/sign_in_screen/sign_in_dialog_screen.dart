@@ -37,6 +37,12 @@ class SignInDialogScreen extends StatelessWidget {
             }
             if(state is VerifyOTPSuccessState){
               await MainCubit.get(context).getUserData();
+              // reset controllers on successful login
+              otpController.forEach((controller) => controller.clear());
+              phoneNumberControllerTemp.clear();
+              phoneNumberController.clear();
+              MainCubit.get(context).signInScreenCurrentIndex = 0;
+              //
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(),), (route) => false);
             }
           },
@@ -145,7 +151,7 @@ class SignInDialogScreen extends StatelessWidget {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Caption
                           Text(
-                            "Enter OTP code sent to your number +201093247769",
+                            "Enter OTP code sent to your number ${phoneNumberController.text}",
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
