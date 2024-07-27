@@ -92,8 +92,13 @@ class SignInDialogScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30), topRight: Radius.circular(30))
                             ),
                             child: defaultButton(
-                              onPress: () {
-                                MainCubit.get(context).sendOTP(phoneNumberController.text);
+                              onPress: () async {
+                                bool phoneIsRegisteredStatus = await MainCubit.get(context).isPhoneRegistered(phoneNumberController.text);
+                                if(phoneIsRegisteredStatus){
+                                  MainCubit.get(context).sendOTP(phoneNumberController.text);
+                                } else {
+                                  showToast(message: "Phone Number is not registered!", toastColor: Colors.red);
+                                }
                               },
                               child: state is SendOTPLoadingState?
                               Row(

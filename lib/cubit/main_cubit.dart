@@ -40,6 +40,23 @@ class MainCubit extends Cubit<MainState>{
     emit(RegisterScreenChanged());
   }
 
+  /// Check if phone number is registered
+  Future<bool> isPhoneRegistered(String phoneNumber) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> phoneNumberSnapshot = await FirebaseFirestore
+          .instance.collection("users")
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+      if (phoneNumberSnapshot.docs.isEmpty) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error){
+      print("Error checking phone number: $error");
+      return false;
+    }
+  }
   /// Send OTP to phone number
   String? myVerificationId;
   void sendOTP(String phoneNumber) async {
@@ -48,7 +65,7 @@ class MainCubit extends Cubit<MainState>{
         phoneNumber: phoneNumber,
 
         verificationCompleted: (PhoneAuthCredential credential) async {
-          print("VERFICATION COMPLETED SUCCESSFULLLLLLLLLLLLLLLYYYYYYYYYYY");
+          print("VERIFICATION COMPLETED SUCCESSFULLLLLLLLLLLLLLLYYYYYYYYYYY");
         },
 
         verificationFailed: (FirebaseAuthException e) {
@@ -135,11 +152,12 @@ class MainCubit extends Cubit<MainState>{
   /// Create User in the DB (Firestore)
   createUser({
     required String name,
+    required String phoneNumber,
     required String profilePic,
 }) async {
     emit(CreateAccountLoadingState());
     String uId = FirebaseAuth.instance.currentUser!.uid;
-    UserModel userModel = UserModel(uId: uId, name: name, profilePic: profilePic);
+    UserModel userModel = UserModel(uId: uId, phoneNumber: phoneNumber, name: name, profilePic: profilePic);
     await FirebaseFirestore.instance.collection('users').doc(uId).set(userModel.toMap()).then((value) {
       uID = uId;
       emit(CreateAccountSuccessState());
@@ -228,7 +246,7 @@ class MainCubit extends Cubit<MainState>{
     for (File element in file) {
       await FirebaseStorage.instance.ref()
           // Upload File to Firebase Storage
-          .child('users/$uID/profile_pictures/${Random().nextInt(999999)}${Uri.file(element.path).pathSegments.last}')
+          .child('users/$uID/postPics/${Random().nextInt(999999)}${Uri.file(element.path).pathSegments.last}')
           .putFile(element).then((value1) async {
             // Get File Url
             await value1.ref.getDownloadURL().then((value2) {

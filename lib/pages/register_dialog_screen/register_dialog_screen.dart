@@ -92,8 +92,13 @@ class RegisterDialogScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30), topRight: Radius.circular(30))
                             ),
                             child: defaultButton(
-                              onPress: () {
-                                MainCubit.get(context).sendOTP(phoneNumberController.text);
+                              onPress: () async {
+                                bool phoneIsRegisteredStatus = await MainCubit.get(context).isPhoneRegistered(phoneNumberController.text);
+                                if(phoneIsRegisteredStatus){
+                                  showToast(message: "Phone Number already exist, Please Sign in!", toastColor: Colors.red);
+                                } else {
+                                  MainCubit.get(context).sendOTP(phoneNumberController.text);
+                                }
                               },
                               child: state is SendOTPLoadingState?
                               Row(
@@ -336,10 +341,12 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                             child: defaultButton(
                               onPress: () async {
-                                await MainCubit.get(context).uploadProfilePic();
-                                print("LLLLLLLLLLLLLLLLLLLLLLLLLLL${MainCubit.get(context).picUrl}");
+                                if(MainCubit.get(context).profilePic != null){
+                                  await MainCubit.get(context).uploadProfilePic();
+                                }
                                 await MainCubit.get(context).createUser(
                                     name: profileNameController.text,
+                                    phoneNumber: phoneNumberController.text,
                                     profilePic: MainCubit.get(context).picUrl?? profilePicUrl
                                 );
                                 await MainCubit.get(context).getUserData();

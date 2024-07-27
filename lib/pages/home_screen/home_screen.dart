@@ -46,6 +46,11 @@ class HomeScreen extends StatelessWidget {
       listener: (context, state) async {
         /// Refresh time to check if post still deletable or no ((Need a better method)) ///
         await localNTPTime();
+        if (state is SelectPicFromGallerySuccessState){
+          await MainCubit.get(context).uploadProfilePic();
+          MainCubit.get(context).updateUserProfile(name: MainCubit.get(context).originalUser!.name!, profilePic: MainCubit.get(context).picUrl!);
+          MainCubit.get(context).getUserData();
+        }
       },
       builder: (context, state) {
       return ConditionalBuilder(
@@ -101,22 +106,47 @@ class HomeScreen extends StatelessWidget {
                                                 borderRadius: BorderRadius.all(Radius.circular(25)),
                                               ),
                                               child: Scaffold(
-                                                body: SingleChildScrollView(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(backgroundImage: NetworkImage(MainCubit.get(context).originalUser!.profilePic!), radius: height(ofHeight: 0.1)),
-                                                      Text(MainCubit.get(context).originalUser!.name!),
-                                                      Container(
-                                                        child: defaultButton(
-                                                            onPress: () async {
-                                                              await MainCubit.get(context).singOut();
-                                                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnBoardingScreen(),), (route) => false);
-                                                            },
-                                                            text: 'Log out'
+                                                resizeToAvoidBottomInset: false, // Prevents resizing when the keyboard appears
+                                                body: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Stack(
+                                                      alignment: Alignment.bottomRight,
+                                                      children: [
+                                                        /// Pic
+                                                        CircleAvatar(
+                                                          radius: MediaQuery.of(context).size.height * 0.1,
+                                                          backgroundImage: NetworkImage(MainCubit.get(context).originalUser!.profilePic!)
                                                         ),
-                                                      )
-                                                    ],
-                                                  ),
+                                                        /// Edit Button
+                                                        Container(
+                                                          height: MediaQuery.of(context).size.height * 0.05,
+                                                          width: MediaQuery.of(context).size.height * 0.05,
+                                                          decoration: ShapeDecoration(shape: const CircleBorder(), color: Colors.grey.withOpacity(0.5),),
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              MainCubit.get(context).selectPicFromGallery();
+                                                            },
+                                                            splashRadius: 20,
+                                                            padding: const EdgeInsets.only(bottom: 5),
+                                                            icon: Icon(TablerIcons.edit, size: MediaQuery.of(context).size.height * 0.04,),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(MainCubit.get(context).originalUser!.name!),
+                                                    SizedBox(height: height(ofHeight: 0.05),),
+                                                    Container(
+                                                      padding: EdgeInsets.symmetric(horizontal: width(ofWidth: 0.1)),
+                                                      child: defaultButton(
+                                                          onPress: () async {
+                                                            await MainCubit.get(context).singOut();
+                                                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OnBoardingScreen(),), (route) => false);
+                                                          },
+                                                          text: 'Log out'
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
                                               ),
                                             ),
@@ -328,7 +358,7 @@ enum UrlType { IMAGE, VIDEO, UNKNOWN }
 UrlType getUrlType(String url) {
   Uri uri = Uri.parse(url);
   String typeString = uri.path.substring(uri.path.length - 3).toLowerCase();
-  if (typeString == "jpg" || typeString == 'peg') {
+  if (typeString == "jpg" || typeString == 'peg' || typeString == 'png') {
     return UrlType.IMAGE;
   }
   if (typeString == "mp4") {

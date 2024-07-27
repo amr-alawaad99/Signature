@@ -8,9 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
-        android:label="signature"
+        android:label="Signature"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ture">
         <activity
             android:name=".MainActivity"
             android:exported="true"
