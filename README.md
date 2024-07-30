@@ -1,7 +1,11 @@
-Signature is a personal posts app where you can save your moments and favorite memories in a place that no one can touch, edit, or delete. That's right, not even you! In Signature, your post cannot be deleted after one hour of posting, so make sure it truly is a moment you don’t want to forget! 😉
+# Signature, a flutter project built with Firebase as a back-end
+
+## This app focuses on phone authentication(Firebase Auth), FirebaseFirestore, FirebaseStorage, photo manager and video player, animation, and using a customizable media picker!
+
+Signature is a personal posts app where you can save your moments and favorite memories in a place that no one can touch, edit, or delete. That's right, not even you! and no, it's not a social media!.
+In Signature, your post cannot be deleted after one hour of posting, so make sure it truly is a moment you don’t want to forget! 😉
 
 
-This app focuses on phone authentication, photo manager and video player, animation, and using a customizable media picker!
 
 
 
