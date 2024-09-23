@@ -25,7 +25,7 @@ Future<void> main() async {
 
   Widget widget;
 
-  print("GGG $uID");
+  print("UID is: $uID");
   if (uID == '') {
     widget = const OnBoardingScreen();
   } else {

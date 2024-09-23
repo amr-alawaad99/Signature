@@ -1,11 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-
 import '../../components.dart';
 import '../../constants.dart';
 import '../../cubit/main_cubit.dart';
@@ -15,9 +11,8 @@ import '../home_screen/home_screen.dart';
 class RegisterDialogScreen extends StatelessWidget {
   const RegisterDialogScreen({super.key});
 
-  static final TextEditingController phoneNumberController = TextEditingController();
-  static final TextEditingController phoneNumberControllerTemp = TextEditingController();
-  static final List<TextEditingController> otpController = List.generate(6, (index) => TextEditingController());
+  static final TextEditingController emailController = TextEditingController();
+  static final TextEditingController passwordController = TextEditingController();
   static final TextEditingController profileNameController = TextEditingController();
   static final GlobalKey<FormState>formKey = GlobalKey<FormState>();
 
@@ -65,23 +60,38 @@ class RegisterDialogScreen extends StatelessWidget {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
                           /// Caption
                           Text(
-                            'access all favorite moments you saved and bring back the memories, save new moments and access them any time!',
+                            'Signature is a personal posts app where you can save your moments and favorite memories in a place that no one can touch, edit, or delete. That\'s right, not even you! In Signature, your posts cannot be deleted after one hour of posting, so make sure it truly is a moment you don’t want to forget! 😉',
                             style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: MediaQuery.of(context).size.height * 0.02),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-                          /// Phone TextFormField
-                          IntlPhoneField(
-                            controller: phoneNumberControllerTemp,
-                            initialCountryCode: 'EG',
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: const BorderSide(color: secondaryColor)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-                              labelText: 'Phone Number',
-                              border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                            ),
-                            onChanged: (value) {
-                              phoneNumberController.text = value.completeNumber;
-                            },
+                          /// Email TextFormField
+                          CustomInputField(
+                            labelText: "Email",
+                            hintText: "Enter your email address",
+                            haveBorder: true,
+                            filled: true,
+                            controller: emailController,
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
+                          /// Password TextFormField
+                          CustomInputField(
+                            labelText: "Password",
+                            hintText: "Enter your password",
+                            haveBorder: true,
+                            filled: true,
+                            controller: passwordController,
+                            suffixIcon: true,
+                            obscureText: true,
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
+                          /// re-password TextFormField
+                          CustomInputField(
+                            hintText: "re-enter password",
+                            haveBorder: true,
+                            filled: true,
+                            controller: passwordController,
+                            suffixIcon: true,
+                            obscureText: true,
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
                           /// Next Button
@@ -93,12 +103,7 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                             child: defaultButton(
                               onPress: () async {
-                                bool phoneIsRegisteredStatus = await MainCubit.get(context).isPhoneRegistered(phoneNumberController.text);
-                                if(phoneIsRegisteredStatus){
-                                  showToast(message: "Phone Number already exist, Please Sign in!", toastColor: Colors.red);
-                                } else {
-                                  MainCubit.get(context).sendOTP(phoneNumberController.text);
-                                }
+
                               },
                               child: state is SendOTPLoadingState?
                               Row(
@@ -120,20 +125,19 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
-                          // const Text('-or-'),
-                          // SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
-                          // /// Google Signup Button
-                          // Ink(
-                          //   height: MediaQuery.of(context).size.height * 0.07,
-                          //   width: MediaQuery.of(context).size.height * 0.07,
-                          //   decoration: ShapeDecoration(shape: const CircleBorder(), color: Colors.grey.shade300,),
-                          //   child: IconButton(
-                          //     onPressed: () {},
-                          //     splashRadius: 30,
-                          //     padding: const EdgeInsets.only(bottom: 5),
-                          //     icon: Icon(TablerIcons.brand_google, color: Colors.red, size: MediaQuery.of(context).size.height * 0.05,),
-                          //   ),
-                          // ),
+                          const Text('-or-'),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
+                          /// Google Signup Button
+                          Ink(
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            width: MediaQuery.of(context).size.height * 0.07,
+                            decoration: ShapeDecoration(shape: const CircleBorder(), color: Colors.grey.shade300,),
+                            child: IconButton(
+                              onPressed: () {},
+                              splashRadius: 30,
+                              icon: Icon(TablerIcons.brand_google, color: Colors.red, size: MediaQuery.of(context).size.height * 0.05,),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -155,125 +159,6 @@ class RegisterDialogScreen extends StatelessWidget {
                 ],
               ) :
               /// Second Page
-              MainCubit.get(context).registerScreenCurrentIndex == 1?
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          /// Title
-                          Text(
-                            "Verification",
-                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: MediaQuery.of(context).size.height * 0.05),
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-                          /// Caption
-                          Text(
-                            "Enter OTP code sent to your number +201093247769",
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-                          /// OTP TextFormField
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: List.generate(6, (index) => SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.12,
-                                child: TextFormField(
-                                  textAlign: TextAlign.center,
-                                  keyboardType: TextInputType.number,
-                                  controller: otpController[index],
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                  decoration: const InputDecoration(
-                                    enabledBorder: OutlineInputBorder(),
-                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.green)),
-                                  ),
-                                  onChanged: (value) {
-                                    if(value.isNotEmpty){
-                                      FocusScope.of(context).nextFocus();
-                                    } else if(value.isEmpty){
-                                      FocusScope.of(context).previousFocus();
-                                    }
-                                  },
-                                ),
-                              )),
-                            ),
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-                          /// Next Button
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            clipBehavior: Clip.antiAlias,
-                            decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30), topRight: Radius.circular(30))
-                            ),
-                            child: defaultButton(
-                              onPress: () {
-                                String otp = '';
-                                otpController.forEach((element) {
-                                  otp += element.text;
-                                });
-                                MainCubit.get(context).verifyOTP(verificationId: MainCubit.get(context).myVerificationId!, otpCode: otp);
-                                print("/////////////////////////$otp");
-                              },
-                              child: state is VerifyOTPLoadingState?
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const CircularProgressIndicator(),
-                                  SizedBox(width: MediaQuery.of(context).size.width * 0.02,),
-                                  Text('Verifying OTP', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey),)
-                                ],
-                              ) :
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(TablerIcons.arrow_right),
-                                  SizedBox(width: MediaQuery.of(context).size.width * 0.02,),
-                                  Text('Next', style: Theme.of(context).textTheme.bodyMedium,)
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-                          /// Change phone number TextButton
-                          TextButton(
-                            onPressed: () {
-                              MainCubit.get(context).changeRegisterScreen(0);
-                            },
-                            child: Text(
-                              "Change Phone Number",
-                              style: Theme.of(context).textTheme.bodySmall!.copyWith(color: Colors.blue),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  /// Close Button
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: -48,
-                    child: InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.close, color: Colors.black,),
-                      ),
-                    ),
-                  ),
-                ],
-              ) :
-              /// Third Page
               Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -341,15 +226,6 @@ class RegisterDialogScreen extends StatelessWidget {
                             ),
                             child: defaultButton(
                               onPress: () async {
-                                if(MainCubit.get(context).profilePic != null){
-                                  await MainCubit.get(context).uploadProfilePic();
-                                }
-                                await MainCubit.get(context).createUser(
-                                    name: profileNameController.text,
-                                    phoneNumber: phoneNumberController.text,
-                                    profilePic: MainCubit.get(context).picUrl?? profilePicUrl
-                                );
-                                await MainCubit.get(context).getUserData();
                                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(),), (route) => false);
                               },
                               child: state is UploadProfilePicLoadingState || state is CreateAccountLoadingState?

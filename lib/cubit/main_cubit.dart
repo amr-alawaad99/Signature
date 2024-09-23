@@ -326,7 +326,7 @@ class MainCubit extends Cubit<MainState>{
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .where((element) => element.data()["text"].toString().contains(keyWord) || element.data()["dateTime"].toString().contains(keyWord))
+          .where((element) => element.data()["text"].toString().toLowerCase().contains(keyWord.toLowerCase()) || element.data()["dateTime"].toString().contains(keyWord))
           .map((e) => PostModel.fromJson(e.data()))
           .toList();
     });

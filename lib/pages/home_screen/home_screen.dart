@@ -508,7 +508,7 @@ Widget postCard(context,UserModel userModel , PostModel postModel,) => Padding(
                             return Text('Something went wrong! ${snapshot.error}');
                           } else if (snapshot.hasData) {
                             return Image.file(
-                              File(snapshot.data!), fit: BoxFit.cover,);
+                              File(snapshot.data!), fit: BoxFit.cover, filterQuality: FilterQuality.none,);
                           } else {
                             return Container( height: MediaQuery.of(context).size.aspectRatio, color: Colors.grey.withOpacity(0.8),);
                           }

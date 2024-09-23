@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' as rive;
 import 'package:signature/components.dart';
 import 'package:signature/pages/register_dialog_screen/register_dialog_screen.dart';
 import 'package:signature/pages/sign_in_screen/sign_in_dialog_screen.dart';
@@ -42,7 +42,7 @@ class OnBoardingScreen extends StatelessWidget {
                 left: width(ofWidth: 0.27),
                 child: Image.asset('assets/backgrounds/spline.png'),
               ),
-              const RiveAnimation.asset('assets/rive/shapes.riv'),
+              const rive.RiveAnimation.asset('assets/rive/shapes.riv'),
               /// Blur effect
               Positioned.fill(
                 child: BackdropFilter(
@@ -72,9 +72,6 @@ class OnBoardingScreen extends StatelessWidget {
                             child: defaultButton(
                               gradientColors: [Colors.white, Colors.white],
                               onPress: () {
-                                Future.delayed(
-                                  const Duration(microseconds: 800),
-                                  () {
                                     showGeneralDialog(
                                       context: context,
                                       barrierDismissible: true,
@@ -91,16 +88,14 @@ class OnBoardingScreen extends StatelessWidget {
                                         return const SignInDialogScreen();
                                       },
                                     );
-                                  },
-                                );
                               },
                               height: height(ofHeight: 0.07),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.phone_android, size: height(ofHeight: 0.05),),
+                                  Icon(TablerIcons.mail, size: height(ofHeight: 0.05),),
                                   SizedBox(width: width(ofWidth: 0.02),),
-                                  Text("Sign in with Phone Number", style: TextStyle(
+                                  Text("Sign in with Email", style: TextStyle(
                                     fontSize: MediaQuery.of(context).textScaleFactor * 15,
                                     fontWeight: FontWeight.bold,
                                     ),
@@ -111,24 +106,24 @@ class OnBoardingScreen extends StatelessWidget {
                           ),
                           SizedBox(height: height(ofHeight: 0.02),),
                           /// Google Sign in Button
-                          // Container(
-                          //   child: defaultButton(
-                          //     gradientColors: [Colors.white, Colors.white],
-                          //     onPress: () {},
-                          //     height: height(ofHeight: 0.07),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Icon(TablerIcons.brand_google,color: Colors.red, size: height(ofHeight: 0.05),),
-                          //         SizedBox(width: width(ofWidth: 0.02),),
-                          //         Text("Sign in with Google", style: TextStyle(
-                          //             fontSize: MediaQuery.of(context).textScaleFactor * 15,
-                          //             fontWeight: FontWeight.bold
-                          //         ),),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
+                          Container(
+                            child: defaultButton(
+                              gradientColors: [Colors.white, Colors.white],
+                              onPress: () {},
+                              height: height(ofHeight: 0.07),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(TablerIcons.brand_google,color: Colors.red, size: height(ofHeight: 0.05),),
+                                  SizedBox(width: width(ofWidth: 0.02),),
+                                  Text("Sign in with Google", style: TextStyle(
+                                      fontSize: MediaQuery.of(context).textScaleFactor * 15,
+                                      fontWeight: FontWeight.bold
+                                  ),),
+                                ],
+                              ),
+                            ),
+                          ),
                           SizedBox(height: height(ofHeight: 0.02),),
                           Text('Don\'t have an account?', style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 15),),
                           /// Register text button
